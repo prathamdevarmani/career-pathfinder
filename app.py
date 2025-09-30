@@ -277,11 +277,11 @@ def register():
             if username in users_db:
                 flash('Username already exists!', 'error')
             else:
-               users_db[username] = {
-                   'id': user_counter,
-                   'username': username,
-                   'email': email,
-                   'password_hash': password_hash
+                users_db[username] = {
+                    'id': user_counter,
+                    'username': username,
+                    'email': email,
+                    'password_hash': password_hash
                 }
                 user_counter += 1
                 flash('Registration successful! Please login.', 'success')
