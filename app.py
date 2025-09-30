@@ -208,8 +208,8 @@ def index():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '')
         
         if not username or not password:
             flash('Please enter both username and password', 'danger')
@@ -229,10 +229,11 @@ def login():
                     flash('Login successful!', 'success')
                     return redirect(url_for('home'))
         else:
-            user = next((u for u in users_db.values() if u['username'] == username), None)
+            # In-memory lookup keyed by username
+            user = users_db.get(username)
             if user and check_password_hash(user['password_hash'], password):
                 session['user_id'] = user['id']
-                session['username'] = user['username']
+                session['username'] = username
                 flash('Login successful!', 'success')
                 return redirect(url_for('home'))
                 
@@ -243,10 +244,10 @@ def login():
 def register():
     global user_counter
     if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
-        confirm_password = request.form['confirm_password']
+        username = request.form.get('username', '').strip()
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '')
+        confirm_password = request.form.get('confirm_password', '')
         
         if password != confirm_password:
             flash('Passwords do not match!', 'error')
@@ -276,10 +277,11 @@ def register():
             if username in users_db:
                 flash('Username already exists!', 'error')
             else:
-                users_db[username] = {
-                    'id': user_counter,
-                    'email': email,
-                    'password_hash': password_hash
+               users_db[username] = {
+                'id': user_counter,
+                'username': username,           
+                'email': email,
+                'password_hash': password_hash
                 }
                 user_counter += 1
                 flash('Registration successful! Please login.', 'success')
