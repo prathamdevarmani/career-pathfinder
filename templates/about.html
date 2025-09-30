@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}About - Career Pathfinder{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-gradient-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">About Career Pathfinder</h1>
+                <p class="lead">Empowering professionals with career guidance and personalized job recommendations.</p>
+            </div>
+            <div class="col-lg-6 text-center">
+                <i class="fas fa-robot display-1 opacity-75"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Mission Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="display-5 fw-bold mb-4">Our Mission</h2>
+                <p class="lead text-muted mb-5">
+                    To democratize career guidance by leveraging data-driven insights to provide personalized, 
+                    actionable guidance that helps professionals make informed career decisions and achieve their goals.
+                </p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4 text-center">
+                <div class="feature-box p-4">
+                    <i class="fas fa-chart-line fa-3x text-warning mb-3"></i>
+                    <h4 class="fw-bold">Data-Powered</h4>
+                    <p class="text-muted">Advanced algorithms analyze your skills and match you with the perfect opportunities.</p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="feature-box p-4">
+                    <i class="fas fa-users fa-3x text-success mb-3"></i>
+                    <h4 class="fw-bold">Personalized</h4>
+                    <p class="text-muted">Every recommendation is tailored to your unique skill set, experience level, and career aspirations.</p>
+                </div>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="feature-box p-4">
+                    <i class="fas fa-chart-line fa-3x text-warning mb-3"></i>
+                    <h4 class="fw-bold">Growth-Oriented</h4>
+                    <p class="text-muted">Continuous learning recommendations help you stay ahead in your career journey.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center mb-5">
+                <h2 class="display-5 fw-bold">How It Works</h2>
+                <p class="lead text-muted">Simple, intelligent, effective</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-3 text-center">
+                <div class="step-card">
+                    <div class="step-number bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <span class="h3 mb-0">1</span>
+                    </div>
+                    <h5 class="fw-bold">Profile Creation</h5>
+                    <p class="text-muted">Create your account and build a comprehensive skill profile with both technical and soft skills.</p>
+                </div>
+            </div>
+           <div class="col-lg-3 text-center">
+                <div class="step-card">
+                    <div class="step-number bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <span class="h3 mb-0">2</span>
+                    </div>
+                    <h5 class="fw-bold">Data Analysis</h5>
+                    <p class="text-muted">Our algorithms analyze your skills and experience to understand your career profile and potential.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 text-center">
+                <div class="step-card">
+                    <div class="step-number bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <span class="h3 mb-0">3</span>
+                    </div>
+                    <h5 class="fw-bold">Smart Matching</h5>
+                    <p class="text-muted">Get personalized job recommendations and resume analysis with actionable insights for improvement.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 text-center">
+                <div class="step-card">
+                    <div class="step-number bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                        <span class="h3 mb-0">4</span>
+                    </div>
+                    <h5 class="fw-bold">Career Growth</h5>
+                    <p class="text-muted">Receive upskilling recommendations and track your progress as you advance in your career journey.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="display-5 fw-bold mb-4">Ready to Accelerate Your Career?</h2>
+                <p class="lead mb-4">Join thousands of professionals who trust Career Pathfinder for their career growth</p>
+                {% if not session.user_id %}
+                    <a href="{{ url_for('register') }}" class="btn btn-light btn-lg me-3">Get Started today</a>
+                    <a href="{{ url_for('features') }}" class="btn btn-outline-light btn-lg">Explore Features</a>
+                {% else %}
+                    <a href="{{ url_for('home') }}" class="btn btn-light btn-lg">Go to Dashboard</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+}
+
+.feature-box, .tech-card, .step-card {
+    transition: transform 0.3s ease;
+}
+
+.feature-box:hover, .tech-card:hover, .step-card:hover {
+    transform: translateY(-5px);
+}
+</style>

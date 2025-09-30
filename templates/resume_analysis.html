@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}Resume Analysis Results - Career Pathfinder{% endblock %}
+
+{% block content %}
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex align-items-center mb-4">
+                    <i class="fas fa-chart-line fa-3x text-success me-3"></i>
+                    <div>
+                        <h1 class="display-6 fw-bold mb-0">Resume Analysis Results</h1>
+                        <p class="lead text-muted">Insights and recommendations</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% if analysis.error %}
+        <div class="row">
+            <div class="col-12">
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    {{ analysis.error }}
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <!-- Skills Found -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-success text-white">
+                        <h4 class="mb-0">
+                            <i class="fas fa-check-circle me-2"></i>Skills Identified
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        {% if analysis.found_skills %}
+                            <p class="text-muted mb-3">We found {{ analysis.found_skills|length }} skills in your resume:</p>
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for skill in analysis.found_skills %}
+                                    <span class="badge bg-success rounded-pill px-3 py-2">{{ skill }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No specific skills were identified in your resume. Consider adding more technical and soft skills.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Experience Level -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">
+                            <i class="fas fa-user-tie me-2"></i>Experience Assessment
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center">
+                            <div class="experience-badge mb-3">
+                                {% if analysis.experience_level == 'entry' %}
+                                    <i class="fas fa-seedling fa-3x text-info"></i>
+                                    <h5 class="mt-2 text-info">Entry Level</h5>
+                                {% elif analysis.experience_level == 'mid' %}
+                                    <i class="fas fa-tree fa-3x text-warning"></i>
+                                    <h5 class="mt-2 text-warning">Mid Level</h5>
+                                {% else %}
+                                    <i class="fas fa-crown fa-3x text-success"></i>
+                                    <h5 class="mt-2 text-success">Senior Level</h5>
+                                {% endif %}
+                            </div>
+                            <p class="text-muted">Based on the content and keywords in your resume</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Missing Skills & upskill Suggestions -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-warning text-dark">
+                        <h4 class="mb-0">
+                            <i class="fas fa-plus-circle me-2"></i>Recommended Skills
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        {% if analysis.missing_skills %}
+                            <p class="text-muted mb-3">Consider adding these skills to strengthen your profile:</p>
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for skill in analysis.missing_skills %}
+                                    <span class="badge bg-warning text-dark rounded-pill px-3 py-2">{{ skill }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted">Your skill set looks comprehensive! Keep updating with emerging technologies.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- upskill Courses -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-info text-white">
+                        <h4 class="mb-0">
+                            <i class="fas fa-graduation-cap me-2"></i>Upskill Courses
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        {% if analysis.upskill_suggestions %}
+                            {% for course in analysis.upskill_suggestions %}
+                                <div class="course-item mb-3 p-3 border rounded">
+                                    <h6 class="fw-bold text-primary mb-1">{{ course.course }}</h6>
+                                    <p class="text-muted small mb-1">
+                                        <i class="fas fa-building me-1"></i>{{ course.provider }}
+                                        <span class="mx-2">•</span>
+                                        <i class="fas fa-clock me-1"></i>{{ course.duration }}
+                                    </p>
+                                    <span class="badge bg-light text-dark">{{ course.level }}</span>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted">No specific course recommendations at this time.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- JobRecommendations -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-dark text-white">
+                        <h4 class="mb-0">
+                            <i class="fas fa-briefcase me-2"></i>Recommended Jobs
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        {% if analysis.job_recommendations %}
+                            <div class="row g-3">
+                                {% for job in analysis.job_recommendations %}
+                                    <div class="col-md-6">
+                                        <div class="job-card p-3 border rounded">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <div>
+                                                    <h6 class="fw-bold mb-1">{{ job.title }}</h6>
+                                                    <p class="text-muted small mb-0">
+                                                        <i class="fas fa-building me-1"></i>{{ job.company }}
+                                                        <span class="mx-2">•</span>
+                                                        <i class="fas fa-map-marker-alt me-1"></i>{{ job.location }}
+                                                    </p>
+                                                </div>
+                                                <span class="badge bg-success">{{ job.match_score }}% Match</span>
+                                            </div>
+                                            <div class="d-flex flex-wrap gap-1 mb-2">
+                                                {% for skill in job.matching_skills %}
+                                                    <span class="badge bg-primary rounded-pill small">{{ skill }}</span>
+                                                {% endfor %}
+                                            </div>
+                                            <p class="text-success small mb-0 fw-semibold">{{ job.salary }}</p>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No job recommendations available. Try updating your profile with more skills.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Action Buttons -->
+    <div class="row">
+        <div class="col-12 text-center">
+            <a href="{{ url_for('analyze_resume') }}" class="btn btn-warning btn-lg me-3">
+                <i class="fas fa-upload me-2"></i>Analyze Another Resume
+            </a>
+            <a href="{{ url_for('profile') }}" class="btn btn-primary btn-lg me-3">
+                <i class="fas fa-user-cog me-2"></i>Update Profile
+            </a>
+            <a href="{{ url_for('home') }}" class="btn btn-outline-secondary btn-lg">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.job-card {
+    transition: all 0.3s ease;
+}
+
+.job-card:hover {
+    background-color: #f8f9fa;
+    border-color: #007bff !important;
+}
+
+.course-item {
+    transition: all 0.3s ease;
+}
+
+.course-item:hover {
+    background-color: #f8f9fa;
+    border-color: #17a2b8 !important;
+}
+</style>

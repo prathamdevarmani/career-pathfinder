@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Career Pathfinder{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Welcome Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="bg-gradient-primary text-white rounded-4 p-4">
+                <h1 class="display-6 fw-bold mb-2">Welcome back, {{ username }}!</h1>
+                <p class="lead mb-0">Ready to take the next step in your career journey?</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resume Upload Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h3 class="card-title mb-4">
+                        <i class="fas fa-file-upload text-primary me-2"></i>Upload Your Resume
+                    </h3>
+                    <div id="drop-area" class="border-2 border-dashed rounded-3 p-5 text-center">
+                        <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                        <h5>Drag & drop your resume here</h5>
+                        <p class="text-muted mb-4">or</p>
+                        <input type="file" id="resume-upload" class="d-none" accept=".pdf,.docx">
+                        <button class="btn btn-primary" onclick="document.getElementById('resume-upload').click()">
+                            <i class="fas fa-folder-open me-2"></i>Select File
+                        </button>
+                        <p class="small text-muted mt-2 mb-0">Supported formats: PDF, DOCX (max 16MB)</p>
+                    </div>
+                    <div id="upload-progress" class="progress mt-3 d-none">
+                        <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <div id="upload-result" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Skills Preview Section (will be populated after upload) -->
+    <div id="skills-section" class="row mb-5 d-none">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3 class="card-title mb-0">
+                            <i class="fas fa-star text-warning me-2"></i>Skills Found in Your Resume
+                        </h3>
+                        <button id="save-skills-btn" class="btn btn-success btn-sm">
+                            <i class="fas fa-save me-1"></i> Save to Profile
+                        </button>
+                    </div>
+                    <div id="skills-container" class="d-flex flex-wrap gap-2">
+                        <!-- Skills will be added here dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Action Cards -->
+    <div class="row justify-content-center g-4 mb-5">
+        <div class="col-lg-6">
+            <div class="card h-100 border-0 shadow-lg hover-card">
+                <div class="card-body p-4 text-center">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-user-cog fa-4x text-primary"></i>
+                    </div>
+                    <h4 class="card-title fw-bold mb-3">Profile Management</h4>
+                    <p class="card-text text-muted mb-4">Build and manage your professional profile. Add your skills, set proficiency levels, and keep your information up to date.</p>
+                    <a href="{{ url_for('profile') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-edit me-2"></i>Manage Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card h-100 border-0 shadow-lg hover-card">
+                <div class="card-body p-4 text-center">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-briefcase fa-4x text-success"></i>
+                    </div>
+                    <h4 class="card-title fw-bold mb-3">Job Recommendations</h4>
+                    <p class="card-text text-muted mb-4">Get personalized job recommendations based on your skills and preferences using our advanced matching.</p>
+                    <a href="{{ url_for('job_recommendations') }}" class="btn btn-success btn-lg">
+                        <i class="fas fa-search me-2"></i>Watch recommendations
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Skill Gap Analysis Card -->
+    <div class="row g-4 mt-2">
+        <div class="col-lg-6">
+            <div class="card h-100 border-0 shadow-lg hover-card">
+                <div class="card-body p-4 text-center">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-chart-line fa-4x text-warning"></i>
+                    </div>
+                    <h4 class="card-title fw-bold mb-3">Skill Gap Analysis</h4>
+                    <p class="card-text text-muted mb-4">Analyze your skill gaps for target jobs and get personalized learning recommendations to boost your career readiness.</p>
+                    <a href="{{ url_for('skill_gap_analysis') }}" class="btn btn-warning btn-lg">
+                        <i class="fas fa-analytics me-2"></i>Analyze Skills
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card h-100 border-0 shadow-lg hover-card">
+                <div class="card-body p-4 text-center">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-file-upload fa-4x text-info"></i>
+                    </div>
+                    <h4 class="card-title fw-bold mb-3">Resume Analysis</h4>
+                    <p class="card-text text-muted mb-4">Upload your resume for automated analysis, skill extraction, and improvement suggestions.</p>
+                    <a href="{{ url_for('analyze_resume') }}" class="btn btn-info btn-lg">
+                        <i class="fas fa-upload me-2"></i>Analyze Resume
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card border-0 bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-chart-line text-primary me-2"></i>Your Progress
+                    </h5>
+                    <p class="card-text">Track your career development journey and see how your profile evolves over time.</p>
+                    <small class="text-muted">Last updated: Today</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-lightbulb text-warning me-2"></i>Quick Tip
+                    </h5>
+                    <p class="card-text">Keep your profile updated with new skills and experiences to get better job recommendations!</p>
+                    <small class="text-muted">Career Advisor</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dropArea = document.getElementById('drop-area');
+    const fileInput = document.getElementById('resume-upload');
+    const uploadResult = document.getElementById('upload-result');
+    const progressBar = document.getElementById('progress-bar');
+    const uploadProgress = document.getElementById('upload-progress');
+    const skillsSection = document.getElementById('skills-section');
+    const skillsContainer = document.getElementById('skills-container');
+    const saveSkillsBtn = document.getElementById('save-skills-btn');
+    
+    let currentSkills = [];
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, unhighlight, false);
+    });
+
+    dropArea.addEventListener('drop', handleDrop, false);
+    fileInput.addEventListener('change', handleFiles, false);
+    saveSkillsBtn.addEventListener('click', saveSkillsToProfile);
+
+    function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
+    function highlight() { dropArea.classList.add('bg-light'); }
+    function unhighlight() { dropArea.classList.remove('bg-light'); }
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        handleFiles({ target: { files } });
+    }
+
+    function handleFiles(e) {
+        const files = e.target.files;
+        if (files.length === 0) return;
+        const file = files[0];
+        if (!['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(file.type) && 
+            !file.name.endsWith('.pdf') && !file.name.endsWith('.docx')) {
+            showMessage('Please upload a valid PDF or DOCX file.', 'danger');
+            return;
+        }
+        uploadFile(file);
+    }
+
+    function uploadFile(file) {
+        const formData = new FormData();
+        formData.append('file', file);
+        uploadProgress.classList.remove('d-none');
+        progressBar.style.width = '0%';
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/api/upload-resume', true);
+        xhr.upload.onprogress = function(e) {
+            if (e.lengthComputable) {
+                const percentComplete = Math.round((e.loaded / e.total) * 100);
+                progressBar.style.width = percentComplete + '%';
+                progressBar.setAttribute('aria-valuenow', percentComplete);
+            }
+        };
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                const response = JSON.parse(xhr.responseText);
+                if (response.status === 'success') {
+                    showMessage('Resume processed successfully!', 'success');
+                    displaySkills(response.skills);
+                } else {
+                    showMessage(response.message || 'Error processing resume', 'danger');
+                }
+            } else {
+                showMessage('Error uploading file. Please try again.', 'danger');
+            }
+            uploadProgress.classList.add('d-none');
+        };
+        xhr.onerror = function() {
+            showMessage('Error uploading file. Please try again.', 'danger');
+            uploadProgress.classList.add('d-none');
+        };
+        xhr.send(formData);
+    }
+
+    function showMessage(message, type) {
+        uploadResult.innerHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+    }
+
+    function displaySkills(skills) {
+        if (!skills || skills.length === 0) {
+            skillsContainer.innerHTML = '<p class="text-muted">No skills detected in the resume.</p>';
+        } else {
+            currentSkills = skills;
+            skillsContainer.innerHTML = '';
+            skills.forEach(skill => {
+                const skillBadge = document.createElement('span');
+                skillBadge.className = 'badge bg-primary me-2 mb-2 p-2';
+                skillBadge.innerHTML = `${skill} <i class="fas fa-check-circle ms-1"></i>`;
+                skillsContainer.appendChild(skillBadge);
+            });
+        }
+        skillsSection.classList.remove('d-none');
+    }
+
+    function saveSkillsToProfile() {
+        if (currentSkills.length === 0) return;
+        const originalText = saveSkillsBtn.innerHTML;
+        saveSkillsBtn.disabled = true;
+        saveSkillsBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Saving...';
+        fetch('/api/save-skills', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ skills: currentSkills })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showMessage('Skills saved to your profile successfully!', 'success');
+                saveSkillsBtn.innerHTML = '<i class="fas fa-check me-1"></i> Saved!';
+                saveSkillsBtn.classList.remove('btn-success');
+                saveSkillsBtn.classList.add('btn-secondary');
+            } else {
+                throw new Error(data.message || 'Failed to save skills');
+            }
+        })
+        .catch(error => {
+            showMessage('Error saving skills: ' + error.message, 'danger');
+            saveSkillsBtn.disabled = false;
+            saveSkillsBtn.innerHTML = originalText;
+        });
+    }
+});
+</script>
+
+<style>
+#drop-area { border: 2px dashed #dee2e6; border-radius: 0.5rem; transition: all 0.3s ease; cursor: pointer; }
+#drop-area:hover, #drop-area.highlight { border-color: #0d6efd; background-color: rgba(13, 110, 253, 0.05); }
+.badge { font-size: 0.9rem; font-weight: 500; padding: 0.5rem 0.75rem; border-radius: 0.5rem; }
+.hover-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.hover-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important; }
+.feature-icon i { transition: transform 0.3s ease; }
+.hover-card:hover .feature-icon i { transform: scale(1.1); }
+</style>
+{% endblock %}

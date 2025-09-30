@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{% block title %}Job Tracker - Career Pathfinder{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <!-- Main Job Tracker Column -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="h4 mb-0">
+                            <i class="fas fa-tasks text-primary me-2"></i>My Job Applications
+                        </h2>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addJobModal">
+                            <i class="fas fa-plus me-1"></i> Add Job
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if not jobs or jobs|length == 0 %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-clipboard-list fa-4x text-muted mb-3"></i>
+                            <h4>No jobs tracked yet</h4>
+                            <p class="text-muted">Add your first job application or browse hiring companies to get started!</p>
+                        </div>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Position</th>
+                                        <th>Company</th>
+                                        <th>Status</th>
+                                        <th>Applied Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for job in jobs %}
+                                    <tr>
+                                        <td>
+                                            <div class="fw-bold">{{ job.position }}</div>
+                                            <small class="text-muted">{{ job.job_type or 'Full-time' }}</small>
+                                        </td>
+                                        <td>{{ job.company }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ 'success' if job.status == 'Interview' else 'primary' if job.status == 'Applied' else 'info' if job.status == 'In Progress' else 'warning' if job.status == 'Offer' else 'danger' if job.status == 'Rejected' else 'secondary' }}">
+                                                {{ job.status }}
+                                            </span>
+                                        </td>
+                                        <td>{{ job.applied_date or 'Not applied' }}</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editJobModal{{ loop.index }}">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this job?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Hiring Companies Column -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h3 class="h5 mb-0">
+                        <i class="fas fa-building text-primary me-2"></i>Hiring Now
+                    </h3>
+                </div>
+                <div class="card-body">
+                    {% if not hiring_companies %}
+                        <div class="text-center py-3">
+                            <i class="fas fa-search fa-2x text-muted mb-2"></i>
+                            <p class="text-muted">No hiring data available. Check back later.</p>
+                        </div>
+                    {% else %}
+                        <div class="list-group">
+                            {% for company in hiring_companies %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1 fw-bold">{{ company.company }}</h6>
+                                    <small class="text-{{ 'success' if company.hiring_velocity == 'high' else 'warning' if company.hiring_velocity == 'medium' else 'muted' }}">
+                                        {{ company.hiring_velocity|title }} Hiring
+                                    </small>
+                                </div>
+                                <p class="mb-1 small">
+                                    {% for role in company.most_common_roles[:2] %}
+                                        <span class="badge bg-light text-dark me-1 mb-1">{{ role }}</span>
+                                    {% endfor %}
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">{{ company.locations[0] if company.locations else 'Multiple locations' }}</small>
+                                    <button class="btn btn-sm btn-outline-primary btn-save-job" 
+                                            data-company="{{ company.company }}"
+                                            data-title="{{ company.most_common_roles[0] if company.most_common_roles else 'Position' }}"
+                                            data-location="{{ company.locations[0] if company.locations else '' }}"
+                                            data-job-type="Full-time">
+                                        <i class="far fa-save me-1"></i> Track
+                                    </button>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{{ url_for('hiring_companies') }}" class="btn btn-sm btn-outline-primary">
+                                View All Companies <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Job Modal -->
+<div class="modal fade" id="addJobModal" tabindex="-1" aria-labelledby="addJobModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addJobModalLabel">Add New Job Application</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('save_job') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="position" class="form-label">Job Position *</label>
+                        <input type="text" class="form-control" id="position" name="position" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="company" class="form-label">Company *</label>
+                        <input type="text" class="form-control" id="company" name="company" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="status" class="form-label">Status *</label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="Interested">Interested</option>
+                                <option value="Applied">Applied</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Interview">Interview</option>
+                                <option value="Offer">Offer</option>
+                                <option value="Rejected">Rejected</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="applied_date" class="form-label">Applied Date</label>
+                            <input type="date" class="form-control" id="applied_date" name="applied_date">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="job_type" class="form-label">Job Type</label>
+                        <select class="form-select" id="job_type" name="job_type">
+                            <option value="Full-time">Full-time</option>
+                            <option value="Part-time">Part-time</option>
+                            <option value="Contract">Contract</option>
+                            <option value="Internship">Internship</option>
+                            <option value="Freelance">Freelance</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="location" class="form-label">Location</label>
+                        <input type="text" class="form-control" id="location" name="location" placeholder="e.g., New York, NY">
+                    </div>
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Add any additional notes about this job application"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Job</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set default date to today
+        const today = new Date().toISOString().split('T')[0];
+        const dateInput = document.getElementById('applied_date');
+        if (dateInput) {
+            dateInput.value = today;
+        }
+
+        // Handle save job from hiring companies
+        document.querySelectorAll('.btn-save-job').forEach(button => {
+            button.addEventListener('click', function() {
+                const jobData = {
+                    title: this.dataset.title,
+                    company: this.dataset.company,
+                    job_type: this.dataset.jobType,
+                    location: this.dataset.location,
+                    platform: 'Hiring Companies',
+                    description: `Position at ${this.dataset.company} in ${this.dataset.location || 'various locations'}`
+                };
+
+                fetch('{{ url_for("save_company_job") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(jobData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show success message
+                        const alert = document.createElement('div');
+                        alert.className = 'alert alert-success alert-dismissible fade show';
+                        alert.role = 'alert';
+                        alert.innerHTML = `
+                            <i class="fas fa-check-circle me-2"></i>
+                            ${data.message}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        `;
+                        document.querySelector('.container').prepend(alert);
+                        
+                        // Remove the button or disable it
+                        this.innerHTML = '<i class="fas fa-check me-1"></i> Saved';
+                        this.classList.remove('btn-outline-primary');
+                        this.classList.add('btn-outline-success');
+                        this.disabled = true;
+                        
+                        // Remove alert after 3 seconds
+                        setTimeout(() => {
+                            alert.remove();
+                        }, 3000);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error saving job. Please try again.');
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

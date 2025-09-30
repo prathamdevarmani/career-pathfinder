@@ -1,0 +1,429 @@
+{% extends "base.html" %}
+
+{% block title %}Real-Time Hiring Insights - Career Pathfinder{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="fas fa-chart-line text-primary me-2"></i>
+                Real-Time Hiring Insights
+            </h2>
+            <p class="text-muted mb-4">Live analysis of companies actively hiring on LinkedIn, Indeed, and other platforms with market intelligence.</p>
+        </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="text-center mb-4">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2">Analyzing real-time hiring data across platforms...</p>
+    </div>
+
+    <!-- Real-Time Data Summary -->
+    <div id="realTimeData" class="row mb-4" style="display: none;">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-clock me-2"></i>
+                <strong>Last Updated:</strong> <span id="lastUpdated">-</span> | 
+                <strong>LinkedIn:</strong> <span id="linkedinJobs">0</span> jobs | 
+                <strong>Indeed:</strong> <span id="indeedJobs">0</span> jobs | 
+                <strong>Other Platforms:</strong> <span id="otherJobs">0</span> jobs
+            </div>
+        </div>
+    </div>
+
+    <!-- Market Insights Cards -->
+    <div id="marketInsights" class="row mb-4" style="display: none;">
+        <div class="col-md-3">
+            <div class="card text-center border-primary">
+                <div class="card-body">
+                    <h3 class="text-primary" id="totalJobs">0</h3>
+                    <p class="card-text">Total Active Jobs</p>
+                    <small class="text-muted" id="marketActivity">Market Activity</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center border-success">
+                <div class="card-body">
+                    <h3 class="text-success" id="totalCompanies">0</h3>
+                    <p class="card-text">Companies Hiring</p>
+                    <small class="text-muted" id="highVelocityCount">High Velocity</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center border-warning">
+                <div class="card-body">
+                    <h3 class="text-warning" id="topRole">-</h3>
+                    <p class="card-text">Most In-Demand</p>
+                    <small class="text-muted">Job Role</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center border-info">
+                <div class="card-body">
+                    <h3 class="text-info" id="topLocation">-</h3>
+                    <p class="card-text">Trending Location</p>
+                    <small class="text-muted">Hiring Hub</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- High-Velocity Companies Alert -->
+    <div id="highVelocityAlert" class="row mb-4" style="display: none;">
+        <div class="col-12">
+            <div class="alert alert-warning">
+                <h5><i class="fas fa-fire me-2"></i>High-Velocity Hiring Alert</h5>
+                <p class="mb-2">Companies with aggressive hiring patterns:</p>
+                <div id="highVelocityList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter and Search -->
+    <div id="filterSection" class="row mb-4" style="display: none;">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" id="searchJobs" placeholder="Search jobs or companies...">
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select" id="filterPlatform">
+                                <option value="">All Platforms</option>
+                                <option value="LinkedIn">LinkedIn</option>
+                                <option value="Indeed">Indeed</option>
+                                <option value="Glassdoor">Glassdoor</option>
+                                <option value="Monster">Monster</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select" id="filterVelocity">
+                                <option value="">All Companies</option>
+                                <option value="high">High Velocity</option>
+                                <option value="medium">Medium Velocity</option>
+                                <option value="low">Low Velocity</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="sortJobs">
+                                <option value="velocity">Sort by Hiring Velocity</option>
+                                <option value="date">Sort by Date</option>
+                                <option value="company">Sort by Company</option>
+                                <option value="title">Sort by Job Title</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-success w-100" onclick="refreshAnalysis()">
+                                <i class="fas fa-sync-alt me-1"></i>Refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- All Jobs List with Insights -->
+    <div id="allJobsList" class="row" style="display: none;">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-briefcase text-info me-2"></i>
+                        Live Job Opportunities with Company Insights
+                    </h5>
+                    <span class="badge bg-primary" id="jobCount">0 jobs</span>
+                </div>
+                <div class="card-body">
+                    <div id="jobsContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Alert -->
+    <div id="errorAlert" class="alert alert-danger" style="display: none;">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <span id="errorMessage"></span>
+    </div>
+</div>
+
+<script>
+let allJobs = [];
+let filteredJobs = [];
+let currentResults = null;
+
+// Auto-load analysis when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    analyzeHiringCompanies();
+    
+    // Add event listeners for filtering
+    document.getElementById('searchJobs').addEventListener('input', filterJobs);
+    document.getElementById('filterPlatform').addEventListener('change', filterJobs);
+    document.getElementById('filterVelocity').addEventListener('change', filterJobs);
+    document.getElementById('sortJobs').addEventListener('change', sortAndDisplayJobs);
+});
+
+async function analyzeHiringCompanies() {
+    // Show loading indicator
+    document.getElementById('loadingIndicator').style.display = 'block';
+    document.getElementById('realTimeData').style.display = 'none';
+    document.getElementById('marketInsights').style.display = 'none';
+    document.getElementById('highVelocityAlert').style.display = 'none';
+    document.getElementById('filterSection').style.display = 'none';
+    document.getElementById('allJobsList').style.display = 'none';
+    document.getElementById('errorAlert').style.display = 'none';
+    
+    try {
+        const response = await fetch('/api/analyze_hiring_companies', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                keywords: 'developer OR engineer OR analyst OR manager OR designer OR consultant OR specialist',
+                location: 'India'
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            currentResults = result.data;
+            processJobData(result.data);
+            displayRealTimeInsights(result.data);
+        } else {
+            showError(result.error || 'An error occurred during analysis');
+        }
+    } catch (error) {
+        showError('Network error: ' + error.message);
+    } finally {
+        document.getElementById('loadingIndicator').style.display = 'none';
+    }
+}
+
+function processJobData(data) {
+    allJobs = [];
+    
+    // Extract all individual jobs from companies data with insights
+    Object.entries(data.companies).forEach(([companyName, companyData]) => {
+        const companyInsight = data.company_insights[companyName] || {};
+        
+        companyData.recent_postings.forEach(job => {
+            allJobs.push({
+                ...job,
+                company: companyName,
+                jobCount: companyData.job_count,
+                hiringVelocity: companyInsight.hiring_velocity || 'low',
+                hiringStatus: companyInsight.hiring_status || 'Unknown',
+                urgencyIndicators: companyInsight.urgency_indicators || [],
+                commonRoles: companyInsight.most_common_roles || []
+            });
+        });
+    });
+    
+    filteredJobs = [...allJobs];
+}
+
+function displayRealTimeInsights(data) {
+    // Update real-time data
+    document.getElementById('lastUpdated').textContent = data.real_time_data.last_updated;
+    document.getElementById('linkedinJobs').textContent = data.real_time_data.linkedin_jobs;
+    document.getElementById('indeedJobs').textContent = data.real_time_data.indeed_jobs;
+    document.getElementById('otherJobs').textContent = data.real_time_data.glassdoor_jobs + data.real_time_data.monster_jobs;
+    
+    // Update market insights
+    document.getElementById('totalJobs').textContent = data.total_jobs_found;
+    document.getElementById('totalCompanies').textContent = data.total_companies;
+    document.getElementById('marketActivity').textContent = `${data.market_insights.market_activity} Activity`;
+    document.getElementById('highVelocityCount').textContent = `${data.market_insights.high_velocity_companies_count} High Velocity`;
+    
+    // Update top role and location
+    const topRoles = Object.entries(data.market_insights.most_in_demand_roles);
+    if (topRoles.length > 0) {
+        document.getElementById('topRole').textContent = topRoles[0][0];
+    }
+    
+    if (data.market_insights.trending_locations.length > 0) {
+        document.getElementById('topLocation').textContent = data.market_insights.trending_locations[0];
+    }
+    
+    // Display high-velocity companies alert
+    if (data.market_insights.high_velocity_companies.length > 0) {
+        const highVelocityHtml = data.market_insights.high_velocity_companies.slice(0, 5).map(company => 
+            `<span class="badge bg-danger me-2 mb-1">${company}</span>`
+        ).join('');
+        document.getElementById('highVelocityList').innerHTML = highVelocityHtml;
+        document.getElementById('highVelocityAlert').style.display = 'block';
+    }
+    
+    // Show sections
+    document.getElementById('realTimeData').style.display = 'block';
+    document.getElementById('marketInsights').style.display = 'flex';
+    document.getElementById('filterSection').style.display = 'block';
+    document.getElementById('allJobsList').style.display = 'block';
+    
+    // Display jobs
+    sortAndDisplayJobs();
+}
+
+function sortAndDisplayJobs() {
+    const sortBy = document.getElementById('sortJobs').value;
+    
+    // Sort jobs
+    filteredJobs.sort((a, b) => {
+        switch(sortBy) {
+            case 'velocity':
+                const velocityOrder = {'high': 3, 'medium': 2, 'low': 1};
+                return (velocityOrder[b.hiringVelocity] || 0) - (velocityOrder[a.hiringVelocity] || 0);
+            case 'company':
+                return a.company.localeCompare(b.company);
+            case 'title':
+                return a.title.localeCompare(b.title);
+            case 'date':
+            default:
+                return new Date(b.date || 0) - new Date(a.date || 0);
+        }
+    });
+    
+    displayJobs();
+}
+
+function displayJobs() {
+    const container = document.getElementById('jobsContainer');
+    document.getElementById('jobCount').textContent = `${filteredJobs.length} jobs`;
+    
+    if (filteredJobs.length === 0) {
+        container.innerHTML = '<p class="text-muted text-center">No jobs found matching your criteria.</p>';
+        return;
+    }
+    
+    let html = '';
+    
+    filteredJobs.forEach((job, index) => {
+        const salaryInfo = job.salary ? `<span class="badge bg-success me-2">${job.salary}</span>` : '';
+        const jobUrl = job.url ? `<a href="${job.url}" target="_blank" class="btn btn-sm btn-outline-primary">Apply Now</a>` : '<span class="text-muted">No link</span>';
+        
+        // Velocity badge color
+        const velocityColor = {
+            'high': 'danger',
+            'medium': 'warning', 
+            'low': 'secondary'
+        }[job.hiringVelocity] || 'secondary';
+        
+        // Urgency indicators
+        const urgencyBadges = job.urgencyIndicators.map(indicator => 
+            `<span class="badge bg-warning text-dark me-1" title="${indicator}">⚡</span>`
+        ).join('');
+        
+        html += `
+            <div class="card mb-3 job-card border-${velocityColor === 'danger' ? 'danger' : 'light'}">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-5">
+                            <div class="d-flex align-items-center mb-1">
+                                <h6 class="card-title mb-0 me-2">${job.title}</h6>
+                                ${urgencyBadges}
+                            </div>
+                            <p class="text-primary mb-1">
+                                <strong>${job.company}</strong>
+                                <span class="badge bg-${velocityColor} ms-2">${job.hiringVelocity.toUpperCase()} VELOCITY</span>
+                            </p>
+                            <small class="text-muted">
+                                <i class="fas fa-map-marker-alt me-1"></i>${job.location}
+                                <span class="ms-3"><i class="fas fa-calendar me-1"></i>${job.date}</span>
+                                <span class="ms-3">${job.hiringStatus}</span>
+                            </small>
+                        </div>
+                        <div class="col-md-3">
+                            <span class="badge bg-info">${job.platform}</span>
+                            ${salaryInfo}
+                            <br>
+                            <small class="text-muted">${job.jobCount} total openings</small>
+                        </div>
+                        <div class="col-md-2">
+                            ${job.commonRoles && job.commonRoles.length > 0 ? `
+                                <small class="text-muted">Common roles:</small><br>
+                                ${job.commonRoles.slice(0, 2).map(role => 
+                                    `<span class="badge bg-light text-white me-1">${role}</span>`
+                                ).join('')}
+                            ` : `
+                                <small class="text-muted">Skills:</small><br>
+                                <span class="badge bg-light text-white">${job.hiringVelocity} hiring</span>
+                            `}
+                        </div>
+                        <div class="col-md-2 text-end">
+                            ${jobUrl}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function filterJobs() {
+    const searchTerm = document.getElementById('searchJobs').value.toLowerCase();
+    const platformFilter = document.getElementById('filterPlatform').value;
+    const velocityFilter = document.getElementById('filterVelocity').value;
+    
+    filteredJobs = allJobs.filter(job => {
+        const matchesSearch = !searchTerm || 
+            job.title.toLowerCase().includes(searchTerm) ||
+            job.company.toLowerCase().includes(searchTerm) ||
+            job.location.toLowerCase().includes(searchTerm);
+            
+        const matchesPlatform = !platformFilter || job.platform === platformFilter;
+        const matchesVelocity = !velocityFilter || job.hiringVelocity === velocityFilter;
+        
+        return matchesSearch && matchesPlatform && matchesVelocity;
+    });
+    
+    sortAndDisplayJobs();
+}
+
+function refreshAnalysis() {
+    analyzeHiringCompanies();
+}
+
+function showError(message) {
+    document.getElementById('errorMessage').textContent = message;
+    document.getElementById('errorAlert').style.display = 'block';
+}
+</script>
+
+<style>
+.job-card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.job-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.job-card.border-danger {
+    border-left: 4px solid #dc3545 !important;
+}
+
+.badge {
+    font-size: 0.75em;
+}
+
+.alert-info {
+    background-color: #e3f2fd;
+    border-color: #2196f3;
+    color: #1976d2;
+}
+</style>
+{% endblock %}

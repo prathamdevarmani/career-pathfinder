@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block title %}Skill Gap Analysis - Career Pathfinder{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="display-5 fw-bold">Skill Gap Analysis</h1>
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        Target Job: {{ target_job }}
+                    </button>
+                    <ul class="dropdown-menu">
+                        {% for job in available_jobs %}
+                        <li><a class="dropdown-item" href="{{ url_for('skill_gap_analysis', job=job) }}">{{ job }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overall Readiness Card -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-lg">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h3 class="card-title mb-3">Overall Job Readiness</h3>
+                            <p class="text-muted mb-3">Your compatibility score for {{ target_job }} position</p>
+                            <div class="progress mb-3" style="height: 20px;">
+                                {% set readiness_color = 'success' if gap_analysis.overall_readiness >= 70 else 'warning' if gap_analysis.overall_readiness >= 50 else 'danger' %}
+                                <div class="progress-bar bg-{{ readiness_color }}" role="progressbar" 
+                                     data-width="{{ gap_analysis.overall_readiness }}">
+                                    {{ gap_analysis.overall_readiness }}%
+                                </div>
+                            </div>
+                            <small class="text-muted">
+                                Required Skills: {{ gap_analysis.required_percentage }}% | 
+                                Preferred Skills: {{ gap_analysis.preferred_percentage }}%
+                            </small>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="display-4 fw-bold text-{{ readiness_color }}">
+                                {{ gap_analysis.overall_readiness }}%
+                            </div>
+                            <p class="text-muted mb-0">Job Ready</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Skills Analysis -->
+    <div class="row">
+        <!-- Required Skills -->
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100 border-0 shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-star me-2"></i>Required Skills</h4>
+                </div>
+                <div class="card-body">
+                    {% for skill_data in gap_analysis.required_skills_analysis %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="fw-semibold">{{ skill_data.skill }}</span>
+                            {% if skill_data.status == 'have' %}
+                                <span class="badge bg-success">{{ skill_data.user_proficiency }}</span>
+                            {% else %}
+                                <span class="badge bg-danger">Missing</span>
+                            {% endif %}
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            {% if skill_data.status == 'have' %}
+                                <div class="progress-bar bg-success" 
+                                     data-width="{{ skill_data.progress_percentage }}"></div>
+                            {% else %}
+                                <div class="progress-bar bg-danger" style="width: 100%;"></div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Preferred Skills -->
+        <div class="col-lg-6 mb-4">
+            <div class="card h-100 border-0 shadow">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Preferred Skills</h4>
+                </div>
+                <div class="card-body">
+                    {% for skill_data in gap_analysis.preferred_skills_analysis %}
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="fw-semibold">{{ skill_data.skill }}</span>
+                            {% if skill_data.status == 'have' %}
+                                <span class="badge bg-success">{{ skill_data.user_proficiency }}</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Missing</span>
+                            {% endif %}
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            {% if skill_data.status == 'have' %}
+                                <div class="progress-bar bg-info" 
+                                     data-width="{{ skill_data.progress_percentage }}"></div>
+                            {% else %}
+                                <div class="progress-bar bg-secondary" style="width: 100%;"></div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Improvement Suggestions -->
+    {% if gap_analysis.improvement_areas %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card border-0 shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Recommended Learning Path</h4>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-4">Based on your skill gaps, here are our top recommendations to improve your job readiness:</p>
+                    <div class="row">
+                        {% for suggestion in gap_analysis.improvement_areas %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card border-start border-4 border-warning">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="card-title mb-0">{{ suggestion.course }}</h6>
+                                        <span class="badge bg-{{ 'danger' if suggestion.priority == 'High' else 'warning' }}">
+                                            {{ suggestion.priority }}
+                                        </span>
+                                    </div>
+                                    <p class="card-text small text-muted mb-2">
+                                        <i class="fas fa-graduation-cap me-1"></i>{{ suggestion.provider }} • 
+                                        <i class="fas fa-clock me-1"></i>{{ suggestion.duration }}
+                                    </p>
+                                    <p class="card-text small">
+                                        <strong>Skill:</strong> {{ suggestion.skill }}<br>
+                                        <strong>Level:</strong> {{ suggestion.level }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Action Buttons -->
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <a href="{{ url_for('profile') }}" class="btn btn-primary btn-lg me-3">
+                <i class="fas fa-user-edit me-2"></i>Update Skills
+            </a>
+            <a href="{{ url_for('job_recommendations') }}" class="btn btn-success btn-lg">
+                <i class="fas fa-briefcase me-2"></i>View Job Recommendations
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-card {
+    transition: transform 0.2s;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+}
+
+.progress-bar {
+    transition: width 0.6s ease;
+}
+
+.card {
+    border-radius: 15px;
+}
+
+.card-header {
+    border-radius: 15px 15px 0 0 !important;
+}
+</style>
+
+<script>
+// Set progress bar widths after page load to avoid CSS parsing issues
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('[data-width]').forEach(function(element) {
+        const width = element.getAttribute('data-width');
+        element.style.width = width + '%';
+    });
+});
+</script>
+{% endblock %}

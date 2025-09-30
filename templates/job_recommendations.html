@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Job Recommendations - Career Pathfinder{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex align-items-center mb-4">
+                <i class="fas fa-briefcase fa-3x text-success me-3"></i>
+                <div>
+                    <h1 class="display-6 fw-bold mb-0">Job Recommendations</h1>
+                    <p class="lead text-muted">Personalized job matches based on your skills</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Skills Summary -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-user-check text-primary me-2"></i>Your Skills Profile
+                    </h5>
+                    {% if user_skills %}
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for skill in user_skills %}
+                                <span class="badge bg-primary rounded-pill px-3 py-2">{{ skill }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">
+                            No skills added yet. <a href="{{ url_for('profile') }}" class="text-decoration-none">Update your profile</a> to get personalized recommendations.
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Job Recommendations -->
+    {% if recommendations %}
+        <div class="row g-4">
+            {% for job in recommendations %}
+                <div class="col-lg-6">
+                    <div class="card h-100 border-0 shadow-sm job-card">
+                        <div class="card-header bg-white border-bottom">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0 fw-bold text-primary">{{ job.title }}</h5>
+                                <span class="badge bg-success px-3 py-2">{{ job.match_score }}% Match</span>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="skills-container">
+                                {% for skill in job.skills %}
+                                    {% if skill in job.matching_skills %}
+                                        <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2 mb-2 me-2">
+                                            {{ skill }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-light text-secondary border border-secondary border-opacity-25 px-3 py-2 mb-2 me-2">
+                                            {{ skill }}
+                                        </span>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <i class="fas fa-search fa-4x text-muted mb-3"></i>
+                    <h3 class="text-muted">No Job Recommendations Available</h3>
+                    <p class="text-muted mb-4">Add skills to your profile to get personalized job recommendations.</p>
+                    <a href="{{ url_for('profile') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-user-cog me-2"></i>Update Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Back to Dashboard -->
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <a href="{{ url_for('home') }}" class="btn btn-outline-secondary btn-lg">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.job-card {
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.job-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.card-header {
+    padding: 1.25rem 1.5rem;
+    background-color: #f8f9fa;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.skills-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.badge {
+    font-weight: 500;
+    font-size: 0.85rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.badge:hover {
+    transform: scale(1.05);
+}
+</style>
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Career Pathfinder - Your Career Guide{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section bg-gradient-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">Find Your Perfect Career Path</h1>
+                <p class="lead mb-4">Discover personalized job recommendations, analyze your resume, and get career guidance to accelerate your professional growth.</p>
+                <div class="d-flex gap-3">
+                    {% if not session.user_id %}
+                        <a href="{{ url_for('register') }}" class="btn btn-light btn-lg">Get Started</a>
+                        <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg">Login</a>
+                    {% else %}
+                        <a href="{{ url_for('home') }}" class="btn btn-light btn-lg">Go to Dashboard</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="text-center">
+                    <i class="fas fa-robot display-1 opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Preview -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="display-5 fw-bold">Why Choose Career Pathfinder?</h2>
+                <p class="lead text-muted">Leverage data-driven insights for your career success</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-user-cog fa-3x text-primary"></i>
+                        </div>
+                        <h5 class="card-title">Smart Profile Building</h5>
+                        <p class="card-text">Create a comprehensive skill profile with both IT and non-IT competencies. Track your proficiency levels and career growth.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-briefcase fa-3x text-success"></i>
+                        </div>
+                        <h5 class="card-title">Job Recommendations</h5>
+                        <p class="card-text">Get personalized job recommendations based on your skills, experience, and career preferences using advanced matching.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon mb-3">
+                            <i class="fas fa-file-alt fa-3x text-warning"></i>
+                        </div>
+                        <h5 class="card-title">Resume Analysis</h5>
+                        <p class="card-text">Upload your resume for detailed analysis. Get insights on missing skills, improvement suggestions, and targeted job matches.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="py-5 bg-dark text-white">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="display-5 fw-bold text-white">How It Works</h2>
+                <p class="lead text-light">Simple steps to accelerate your career</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-3 text-center">
+                <div class="step-number bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                    <span class="fw-bold">1</span>
+                </div>
+                <h5>Create Account</h5>
+                <p class="text-muted">Sign up and create your personalized profile</p>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="step-number bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                    <span class="fw-bold">2</span>
+                </div>
+                <h5>Build Profile</h5>
+                <p class="text-muted">Add your skills and set proficiency levels</p>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="step-number bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                    <span class="fw-bold">3</span>
+                </div>
+                <h5>Get Recommendations</h5>
+                <p class="text-muted">Receive personalized job suggestions</p>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="step-number bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                    <span class="fw-bold">4</span>
+                </div>
+                <h5>Analyze & Improve</h5>
+                <p class="text-muted">Upload resume for detailed analysis</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <h2 class="display-5 fw-bold mb-4">Ready to Transform Your Career?</h2>
+                <p class="lead mb-4">Join thousands of professionals who have found their dream jobs with Career Pathfinder</p>
+                {% if not session.user_id %}
+                    <a href="{{ url_for('register') }}" class="btn btn-light btn-lg me-3">Start Your Journey</a>
+                    <a href="{{ url_for('features') }}" class="btn btn-outline-light btn-lg">Learn More</a>
+                {% else %}
+                    <a href="{{ url_for('home') }}" class="btn btn-light btn-lg">Access Dashboard</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

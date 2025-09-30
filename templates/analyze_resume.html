@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Analyze Resume - Career Pathfinder{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex align-items-center mb-4">
+                <i class="fas fa-file-alt fa-3x text-warning me-3"></i>
+                <div>
+                    <h1 class="display-6 fw-bold mb-0">Resume Analysis</h1>
+                    <p class="lead text-muted">Get insights on your resume</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-cloud-upload-alt fa-4x text-warning mb-3"></i>
+                        <h3 class="fw-bold">Upload Your Resume</h3>
+                        <p class="text-muted">We will analyze your resume and provide personalized recommendations</p>
+                    </div>
+
+                    <form method="POST" enctype="multipart/form-data" id="resumeForm">
+                        <div class="mb-4">
+                            <label for="resume" class="form-label fw-semibold">Select Resume File (PDF only)</label>
+                            <div class="input-group">
+                                <input type="file" class="form-control form-control-lg" id="resume" name="resume" 
+                                       accept=".pdf" required>
+                                <button type="submit" class="btn btn-warning btn-lg">
+                                    <i class="fas fa-search me-2"></i>Analyze Resume
+                                </button>
+                            </div>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Maximum file size: 16MB. Only PDF files are supported.
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- What we analyze section -->
+                    <div class="mt-5">
+                        <h4 class="fw-bold mb-3">What We Analyze:</h4>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                                    <div>
+                                        <h6 class="fw-semibold mb-1">Skills Extraction</h6>
+                                        <small class="text-muted">Identifies technical and soft skills from your resume</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                                    <div>
+                                        <h6 class="fw-semibold mb-1">Experience Level</h6>
+                                        <small class="text-muted">Determines your career level and experience</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                                    <div>
+                                        <h6 class="fw-semibold mb-1">Missing Skills</h6>
+                                        <small class="text-muted">Suggests skills that could enhance your profile</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                                    <div>
+                                        <h6 class="fw-semibold mb-1">Job Matching</h6>
+                                        <small class="text-muted">Recommends relevant job opportunities</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                                    <div>
+                                        <h6 class="fw-semibold mb-1">Upskill Suggestions</h6>
+                                        <small class="text-muted">Provides course recommendations for skill gaps</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                                    <div>
+                                        <h6 class="fw-semibold mb-1">Career Insights</h6>
+                                        <small class="text-muted">Actionable advice for career advancement</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Dashboard -->
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <a href="{{ url_for('home') }}" class="btn btn-outline-secondary btn-lg">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+document.getElementById('resumeForm').addEventListener('submit', function(e) {
+    const fileInput = document.getElementById('resume');
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    
+    if (fileInput.files.length > 0) {
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analyzing...';
+        submitBtn.disabled = true;
+    }
+});
+
+// File input validation
+document.getElementById('resume').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        if (file.type !== 'application/pdf') {
+            alert('Please select a PDF file only.');
+            e.target.value = '';
+            return;
+        }
+        
+        if (file.size > 16 * 1024 * 1024) { // 16MB
+            alert('File size must be less than 16MB.');
+            e.target.value = '';
+            return;
+        }
+    }
+});
+</script>
+{% endblock %}
+
+{% endblock %}
