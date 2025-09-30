@@ -12,3 +12,13 @@ build-backend = "setuptools.build_meta"
 
 [tool.isort]
 profile = "black"
+
+[tool.poetry]
+name = "career-pathfinder"
+version = "0.1.0"
+description = "Flask app"
+authors = ["Your Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.12"
+
