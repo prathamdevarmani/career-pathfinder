@@ -3,43 +3,50 @@
 {% block title %}Skill Gap Analysis - Career Pathfinder{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="display-5 fw-bold">Skill Gap Analysis</h1>
-                <div class="dropdown">
-                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                        Target Job: {{ target_job }}
-                    </button>
-                    <ul class="dropdown-menu">
-                        {% for job in available_jobs %}
-                        <li><a class="dropdown-item" href="{{ url_for('skill_gap_analysis', job=job) }}">{{ job }}</a></li>
-                        {% endfor %}
-                    </ul>
+<div class="container-lg px-3 px-md-4 py-3">
+    <!-- Header and Target Job picker -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <h1 class="display-5 fw-bold mb-0">Skill Gap Analysis</h1>
+
+        <div class="job-picker dropdown w-100 w-md-auto">
+            <button class="btn btn-outline-primary dropdown-toggle w-100 w-md-auto" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="listbox">
+                Target Job: {{ target_job }}
+            </button>
+
+            <div class="dropdown-menu p-2 job-menu shadow">
+                <input type="search" class="form-control form-control-sm job-search mb-2" placeholder="Search jobs..."
+                    aria-label="Search jobs">
+                <div class="job-list" role="listbox">
+                    {% for job in available_jobs %}
+                    <a class="dropdown-item" role="option" data-value="{{ job }}"
+                        href="{{ url_for('skill_gap_analysis', job=job) }}">
+                        {{ job }}
+                    </a>
+                    {% endfor %}
                 </div>
             </div>
         </div>
     </div>
-
     <!-- Overall Readiness Card -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card border-0 shadow-lg">
+            <div class="card">
                 <div class="card-body p-4">
                     <div class="row align-items-center">
                         <div class="col-md-8">
                             <h3 class="card-title mb-3">Overall Job Readiness</h3>
                             <p class="text-muted mb-3">Your compatibility score for {{ target_job }} position</p>
-                            <div class="progress mb-3" style="height: 20px;">
-                                {% set readiness_color = 'success' if gap_analysis.overall_readiness >= 70 else 'warning' if gap_analysis.overall_readiness >= 50 else 'danger' %}
-                                <div class="progress-bar bg-{{ readiness_color }}" role="progressbar" 
-                                     data-width="{{ gap_analysis.overall_readiness }}">
+                            <div class="progress mb-3">
+                                {% set readiness_color = 'success' if gap_analysis.overall_readiness >= 70 else
+                                'warning' if gap_analysis.overall_readiness >= 50 else 'danger' %}
+                                <div class="progress-bar bg-{{ readiness_color }}" role="progressbar"
+                                    data-width="{{ gap_analysis.overall_readiness }}">
                                     {{ gap_analysis.overall_readiness }}%
                                 </div>
                             </div>
                             <small class="text-muted">
-                                Required Skills: {{ gap_analysis.required_percentage }}% | 
+                                Required Skills: {{ gap_analysis.required_percentage }}% |
                                 Preferred Skills: {{ gap_analysis.preferred_percentage }}%
                             </small>
                         </div>
@@ -59,7 +66,7 @@
     <div class="row">
         <!-- Required Skills -->
         <div class="col-lg-6 mb-4">
-            <div class="card h-100 border-0 shadow">
+            <div class="card h-100">
                 <div class="card-header bg-primary text-white">
                     <h4 class="mb-0"><i class="fas fa-star me-2"></i>Required Skills</h4>
                 </div>
@@ -69,17 +76,17 @@
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <span class="fw-semibold">{{ skill_data.skill }}</span>
                             {% if skill_data.status == 'have' %}
-                                <span class="badge bg-success">{{ skill_data.user_proficiency }}</span>
+                            <span class="badge bg-success">{{ skill_data.user_proficiency }}</span>
                             {% else %}
-                                <span class="badge bg-danger">Missing</span>
+                            <span class="badge bg-danger">Missing</span>
                             {% endif %}
                         </div>
                         <div class="progress" style="height: 8px;">
                             {% if skill_data.status == 'have' %}
-                                <div class="progress-bar bg-success" 
-                                     data-width="{{ skill_data.progress_percentage }}"></div>
+                            <div class="progress-bar bg-success" data-width="{{ skill_data.progress_percentage }}">
+                            </div>
                             {% else %}
-                                <div class="progress-bar bg-danger" style="width: 100%;"></div>
+                            <div class="progress-bar bg-danger" style="width: 100%;"></div>
                             {% endif %}
                         </div>
                     </div>
@@ -90,7 +97,7 @@
 
         <!-- Preferred Skills -->
         <div class="col-lg-6 mb-4">
-            <div class="card h-100 border-0 shadow">
+            <div class="card h-100">
                 <div class="card-header bg-info text-white">
                     <h4 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Preferred Skills</h4>
                 </div>
@@ -100,17 +107,16 @@
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <span class="fw-semibold">{{ skill_data.skill }}</span>
                             {% if skill_data.status == 'have' %}
-                                <span class="badge bg-success">{{ skill_data.user_proficiency }}</span>
+                            <span class="badge bg-success">{{ skill_data.user_proficiency }}</span>
                             {% else %}
-                                <span class="badge bg-secondary">Missing</span>
+                            <span class="badge bg-secondary">Missing</span>
                             {% endif %}
                         </div>
                         <div class="progress" style="height: 8px;">
                             {% if skill_data.status == 'have' %}
-                                <div class="progress-bar bg-info" 
-                                     data-width="{{ skill_data.progress_percentage }}"></div>
+                            <div class="progress-bar bg-info" data-width="{{ skill_data.progress_percentage }}"></div>
                             {% else %}
-                                <div class="progress-bar bg-secondary" style="width: 100%;"></div>
+                            <div class="progress-bar bg-secondary" style="width: 100%;"></div>
                             {% endif %}
                         </div>
                     </div>
@@ -124,12 +130,13 @@
     {% if gap_analysis.improvement_areas %}
     <div class="row mt-4">
         <div class="col-12">
-            <div class="card border-0 shadow">
+            <div class="card">
                 <div class="card-header bg-warning text-dark">
                     <h4 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Recommended Learning Path</h4>
                 </div>
                 <div class="card-body">
-                    <p class="text-muted mb-4">Based on your skill gaps, here are our top recommendations to improve your job readiness:</p>
+                    <p class="text-muted mb-4">Based on your skill gaps, here are our top recommendations to improve
+                        your job readiness:</p>
                     <div class="row">
                         {% for suggestion in gap_analysis.improvement_areas %}
                         <div class="col-md-6 mb-3">
@@ -137,12 +144,13 @@
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <h6 class="card-title mb-0">{{ suggestion.course }}</h6>
-                                        <span class="badge bg-{{ 'danger' if suggestion.priority == 'High' else 'warning' }}">
+                                        <span
+                                            class="badge bg-{{ 'danger' if suggestion.priority == 'High' else 'warning' }}">
                                             {{ suggestion.priority }}
                                         </span>
                                     </div>
                                     <p class="card-text small text-muted mb-2">
-                                        <i class="fas fa-graduation-cap me-1"></i>{{ suggestion.provider }} • 
+                                        <i class="fas fa-graduation-cap me-1"></i>{{ suggestion.provider }} •
                                         <i class="fas fa-clock me-1"></i>{{ suggestion.duration }}
                                     </p>
                                     <p class="card-text small">
@@ -174,34 +182,191 @@
 </div>
 
 <style>
-.hover-card {
-    transition: transform 0.2s;
-}
+    /* Spacing + weight simplification */
+    h1.display-5 {
+        font-size: 1.75rem;
+        /* smaller title */
+        line-height: 1.2;
+        margin: 0;
+    }
 
-.hover-card:hover {
-    transform: translateY(-5px);
-}
+    .mb-4 {
+        margin-bottom: 1.25rem !important;
+    }
 
-.progress-bar {
-    transition: width 0.6s ease;
-}
+    /* reduce section gaps slightly */
+    .mb-3 {
+        margin-bottom: 0.9rem !important;
+    }
 
-.card {
-    border-radius: 15px;
-}
+    .card {
+        border-radius: 10px;
+    }
 
-.card-header {
-    border-radius: 15px 15px 0 0 !important;
-}
+    /* smaller radius */
+    .card-header {
+        padding: 0.5rem 0.75rem;
+    }
+
+    /* compact header */
+    .card-body {
+        padding: 0.75rem 1rem;
+    }
+
+    /* compact body */
+
+    .shadow-lg {
+        box-shadow: var(--bs-box-shadow-sm) !important;
+    }
+
+    .shadow {
+        box-shadow: var(--bs-box-shadow-sm) !important;
+    }
+
+    /* Compact progress bars globally */
+    .progress {
+        height: 10px !important;
+    }
+
+    /* Compact list items in skill sections */
+    .list-group-item {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+
+    /* Target Job picker: keep simple, full-width on mobile 
+    .job-picker .dropdown-toggle {
+        min-height: 40px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }*/
+
+    .job-menu {
+        width: min(90vw, 420px);
+        max-height: 55vh;
+        overflow: auto;
+    }
+
+    .job-list .dropdown-item {
+        padding-top: 0.45rem;
+        padding-bottom: 0.45rem;
+    }
+
+    /* Desktop: align the picker to the right without extra spacing */
+    @media (min-width: 768px) {
+        .job-picker .dropdown-toggle {
+            width: auto;
+        }
+    }
+
+    /* Mobile: simple and full width */
+    @media (max-width: 576px) {
+        .job-picker .dropdown-toggle {
+            width: 100%;
+        }
+
+        .job-menu {
+            width: 100%;
+            max-height: 55vh;
+        }
+
+        .card-body {
+            padding: 0.75rem !important;
+        }
+
+        /* slightly tighter on mobile */
+    }
+
+    /* Target Job picker responsiveness */
+    .job-picker .dropdown-toggle {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        min-height: 40px; /* add this to keep the control comfortable */
+    }
+    
+    .job-menu {
+        width: min(90vw, 420px);
+        max-height: 60vh;
+        overflow: auto;
+    }
+
+    .job-list .dropdown-item {
+        padding-top: 0.45rem;
+        padding-bottom: 0.45rem;
+    }
+
+    /* Mobile: full-width control and menu */
+    @media (max-width: 576px) {
+        .job-picker .dropdown-toggle {
+            width: 100%;
+        }
+
+        .job-menu {
+            width: 100%;
+            max-height: 55vh;
+        }
+    }
+
+    .hover-card {
+        transition: transform 0.2s;
+    }
+
+    .hover-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .progress-bar {
+        transition: width 0.6s ease;
+    }
+
+    .card-header {
+        border-radius: 15px 15px 0 0 !important;
+    }
 </style>
 
 <script>
-// Set progress bar widths after page load to avoid CSS parsing issues
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('[data-width]').forEach(function(element) {
-        const width = element.getAttribute('data-width');
-        element.style.width = width + '%';
+    document.addEventListener('DOMContentLoaded', function () {
+        const picker = document.querySelector('.job-picker');
+        if (!picker) return;
+
+        const menu = picker.querySelector('.job-menu');
+        const search = picker.querySelector('.job-search');
+        const items = Array.from(picker.querySelectorAll('.job-list .dropdown-item'));
+
+        if (picker && search && items.length) {
+            // Focus search when dropdown opens
+            picker.addEventListener('shown.bs.dropdown', function () {
+                search.value = '';
+                items.forEach(a => a.classList.remove('d-none'));
+                setTimeout(() => search.focus(), 50);
+            });
+
+            // Filter list as you type
+            search.addEventListener('input', function () {
+                const q = this.value.trim().toLowerCase();
+                items.forEach(a => {
+                    const show = !q || a.textContent.toLowerCase().includes(q);
+                    a.classList.toggle('d-none', !show);
+                });
+            });
+
+            // Enter key selects first visible match
+            search.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    const first = items.find(a => !a.classList.contains('d-none'));
+                    if (first) window.location.href = first.getAttribute('href');
+                }
+            });
+        }
     });
+    document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('[data-width]').forEach(function (el) {
+    var val = parseFloat(el.getAttribute('data-width')) || 0;
+    val = Math.max(0, Math.min(100, val));
+    el.style.width = val + '%';
+  });
 });
 </script>
 {% endblock %}
