@@ -354,6 +354,7 @@ def profile():
                 cursor.close()
                 connection.close()
                 flash('Profile updated successfully!', 'success')
+                return redirect(url_for('profile'))
         else:
             # In-memory storage for demo
             user_skills_db[user_id] = []
@@ -371,6 +372,7 @@ def profile():
                 user_skills_db[user_id].append((skill, 'Non-IT', proficiency))
             
             flash('Profile updated successfully!', 'success')
+            return redirect(url_for('profile'))
     
     # Get current user skills
     user_skills = []
