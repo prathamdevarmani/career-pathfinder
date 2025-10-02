@@ -61,10 +61,11 @@ hiring_companies_analyzer = HiringCompaniesAnalyzer()
 
 # Database configuration (for when MySQL is available)
 DB_CONFIG = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': '',  # Change this to your MySQL password
-    'database': 'career_pathfinder'
+    'host': os.environ.get('MYSQL_HOST', 'localhost'),
+    'port': int(os.environ.get('MYSQL_PORT', '3306')),
+    'user': os.environ.get('MYSQL_USER', 'root'),
+    'password': os.environ.get('MYSQL_PASSWORD', ''),  # set in Render
+    'database': os.environ.get('MYSQL_DATABASE', 'career_pathfinder'),
 }
 
 def get_db_connection():
@@ -84,12 +85,9 @@ def init_database():
         connection = get_db_connection()
         if connection:
             cursor = connection.cursor()
-            
-            # Create database if not exists
-            cursor.execute("CREATE DATABASE IF NOT EXISTS career_pathfinder")
-            cursor.execute("USE career_pathfinder")
-            
-            # Create users table
+
+            # Managed DBs (Railway) already have the database present.
+            # Only ensure tables exist; do not CREATE DATABASE or USE.
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS users (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -99,8 +97,7 @@ def init_database():
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
-            
-            # Create user_skills table
+
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS user_skills (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -111,7 +108,7 @@ def init_database():
                     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
                 )
             """)
-            
+
             connection.commit()
             cursor.close()
             connection.close()
@@ -355,6 +352,7 @@ def profile():
                 connection.close()
                 flash('Profile updated successfully!', 'success')
                 return redirect(url_for('profile'))
+                
         else:
             # In-memory storage for demo
             user_skills_db[user_id] = []
