@@ -44,6 +44,9 @@ except ImportError:
     print("Scikit-learn not available - using basic matching")
 
 app = Flask(__name__)
+@app.before_first_request
+def _ensure_db_initialized():
+    init_database()
 app.secret_key = os.environ.get('SECRET_KEY', os.environ.get('FLASK_SECRET', 'dev-secret-change-me'))  # Change this to a secure secret key in production
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
