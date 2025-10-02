@@ -115,11 +115,13 @@ def init_database():
             print("Database initialized successfully!")
     else:
         print("Using in-memory storage for demo")
-        try:
-            init_database()
-        except Exception as e:
-            print(f"Database init error: {e}")
-
+        
+# Initialize DB at import time (works under Gunicorn/Render)
+try:
+    init_database()
+except Exception as e:
+    print(f"Database init error: {e}")
+    
 # Sample skills data with categories
 IT_SKILLS = {
     "Programming Languages": [
